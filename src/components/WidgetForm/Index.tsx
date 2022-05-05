@@ -6,6 +6,7 @@ import thoghtImageUrl from '../../assets/thought.svg';
 import { useState } from "react";
 import { FeedbackTypeStep } from "./steps/FeedbackTypeStep";
 import { FeedbackContentStep } from "./steps/FeedbackContentStep";
+import { FeedbackSuccessStep } from "./steps/FeedbackSuccessStep";
 
 export const feedbackTypes = {
   BUG: {
@@ -35,8 +36,10 @@ export type FeedbackType = keyof typeof feedbackTypes;
 
 export function WidgetForm() {
   const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null)
+  const [feedbackSent, setFeedbackSent] = useState(false)
 
   function handleRestartFeedback() {
+    setFeedbackSent(false)
     setFeedbackType(null)
   }
 
@@ -50,15 +53,21 @@ export function WidgetForm() {
       w-[calc(100vw-2rem)] md:w-auto
       ">
 
-        {!feedbackType ? (
-            <FeedbackTypeStep onFeedbackTypeStepChanged={setFeedbackType}/>
-          ) : (
-            <FeedbackContentStep
-              feedbackType={feedbackType} 
-              onFeedbackRestartRequested={handleRestartFeedback}
-            />
-          )
-        }
+        {feedbackSent ? (
+          <FeedbackSuccessStep onFeedbackRestartRequested={handleRestartFeedback} />
+        ) : (
+          <>
+            {!feedbackType ? (
+              <FeedbackTypeStep onFeedbackTypeStepChanged={setFeedbackType}/>
+            ) : (
+                  <FeedbackContentStep
+                    onFeedbackSent={() => setFeedbackSent(true)}
+                    feedbackType={feedbackType} 
+                    onFeedbackRestartRequested={handleRestartFeedback}
+                  />
+                )}
+          </>
+        )}
 
         <footer className="text-xs text-neutral-400">
           <span>
